@@ -44,7 +44,7 @@ async function handleMainSteps(ctx) {
     });
   }
 
-  const { error, value } = schema.validate(ctx.message.text);
+  const { error, value } = schema.validate(ctx.message?.text);
   if (error) {
     await ctx.reply(`❗ ${error.message}\n${hints[step] || ''}`.trim(), keyboards[step] || undefined);
     return;
