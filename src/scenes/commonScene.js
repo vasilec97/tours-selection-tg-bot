@@ -10,6 +10,11 @@ function makeStepHandler(idx) {
     const step = ctx.session.step || 0;
     let schema = schemas[step];
 
+    // Не обрабатываем шаг 5 (даты) — он должен быть только в handleDateStep
+    if (step === 5) {
+      return ctx.wizard.next();
+    }
+
     // Для пожеланий и email разрешаем "Пропустить" и пустой ввод
     if (step === 9 || step === 12) {
       if (ctx.message.text === 'Пропустить' || ctx.message.text.trim() === '') {
@@ -18,7 +23,7 @@ function makeStepHandler(idx) {
         if (ctx.session.step < questions.length) {
           await ctx.reply(
             `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
-            (step === 9 || step === 12) ? skipKeyboard : keyboards[ctx.session.step] || undefined
+            (step + 1 === 9 || step + 1 === 12) ? skipKeyboard : Markup.removeKeyboard()
           );
           return;
         }
@@ -29,7 +34,7 @@ function makeStepHandler(idx) {
 
     const { error, value } = schema.validate(ctx.message.text);
     if (error) {
-      await ctx.reply(`❗ ${error.message}\n${hints[step] || ''}`.trim(), (step === 9 || step === 12) ? skipKeyboard : keyboards[step] || undefined);
+      await ctx.reply(`❗ ${error.message}\n${hints[step] || ''}`.trim(), (step === 9 || step === 12) ? skipKeyboard : keyboards[step] || Markup.removeKeyboard());
       return;
     }
     ctx.session.answers[step] = value;
@@ -37,7 +42,7 @@ function makeStepHandler(idx) {
     if (ctx.session.step < questions.length) {
       await ctx.reply(
         `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
-        (step + 1 === 9 || step + 1 === 12) ? skipKeyboard : keyboards[ctx.session.step] || undefined
+        (step + 1 === 9 || step + 1 === 12) ? skipKeyboard : keyboards[ctx.session.step] || Markup.removeKeyboard()
       );
       return;
     }
