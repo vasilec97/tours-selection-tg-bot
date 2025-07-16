@@ -7,9 +7,6 @@ const skipKeyboard = Markup.keyboard([['Пропустить']]).oneTime().resiz
 
 function makeStepHandler(idx) {
   return async function(ctx) {
-    // Временная отладка через Telegram
-    await ctx.reply(`DEBUG: step=${ctx.session.step}, text=${ctx.message && ctx.message.text}`);
-
     const step = ctx.session.step || 0;
     let schema = schemas[step];
 
@@ -24,10 +21,6 @@ function makeStepHandler(idx) {
         ctx.session.answers[step] = '';
         ctx.session.step++;
         if (ctx.session.step < questions.length) {
-          // После этих шагов сбрасываем клавиатуру
-          await ctx.reply(
-            `DEBUG: skip step=${step}, next step=${ctx.session.step}`
-          );
           await ctx.reply(
             `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
             (ctx.session.step === 9 || ctx.session.step === 12)
@@ -56,10 +49,6 @@ function makeStepHandler(idx) {
     ctx.session.answers[step] = value;
     ctx.session.step++;
     if (ctx.session.step < questions.length) {
-      // После этих шагов сбрасываем клавиатуру
-      await ctx.reply(
-        `DEBUG: step=${step}, next step=${ctx.session.step}`
-      );
       await ctx.reply(
         `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
         (ctx.session.step === 9 || ctx.session.step === 12)
