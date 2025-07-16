@@ -21,9 +21,10 @@ function makeStepHandler(idx) {
         ctx.session.answers[step] = '';
         ctx.session.step++;
         if (ctx.session.step < questions.length) {
+          // После этих шагов сбрасываем клавиатуру
           await ctx.reply(
             `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
-            (step + 1 === 9 || step + 1 === 12) ? skipKeyboard : Markup.removeKeyboard()
+            (ctx.session.step === 9 || ctx.session.step === 12) ? skipKeyboard : Markup.removeKeyboard()
           );
           return;
         }
@@ -40,9 +41,10 @@ function makeStepHandler(idx) {
     ctx.session.answers[step] = value;
     ctx.session.step++;
     if (ctx.session.step < questions.length) {
+      // После этих шагов сбрасываем клавиатуру
       await ctx.reply(
         `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
-        (step + 1 === 9 || step + 1 === 12) ? skipKeyboard : keyboards[ctx.session.step] || Markup.removeKeyboard()
+        (ctx.session.step === 9 || ctx.session.step === 12) ? skipKeyboard : keyboards[ctx.session.step] || Markup.removeKeyboard()
       );
       return;
     }

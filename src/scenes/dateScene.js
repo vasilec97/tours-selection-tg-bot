@@ -2,6 +2,7 @@ const { Markup } = require('telegraf');
 const { monthList, questions, hints, keyboards } = require('../const');
 
 async function handleDateStep(ctx) {
+  // Если пользователь только выбирает тип даты — не двигаем шаг!
   if (ctx.session.dateStep === 'chooseType') {
     const type = ctx.message.text;
 
@@ -15,7 +16,7 @@ async function handleDateStep(ctx) {
           }
         });
         ctx.session.dateStep = 'waitCalendar';
-        return;
+        return; // НЕ двигаем шаг!
 
       case '📆 Указать диапазон':
         await ctx.reply('Введите диапазон дат в формате: 20.08.2024 - 30.08.2024\n\nПример: 15.07.2024 - 25.07.2024');
@@ -32,10 +33,10 @@ async function handleDateStep(ctx) {
         ctx.session.step++;
         await ctx.reply(
           `${questions[6]}\n${hints[6] || ''}`.trim(),
-          keyboards[6] || undefined
+          keyboards[6] || Markup.removeKeyboard()
         );
         ctx.session.dateStep = null;
-        return ctx.wizard.selectStep(1);
+        return ctx.wizard.next();
 
       default:
         await ctx.reply('Пожалуйста, выберите вариант с клавиатуры.');
@@ -43,21 +44,22 @@ async function handleDateStep(ctx) {
     }
   }
 
+  // Ожидание выбора даты через календарь
   if (ctx.session.dateStep === 'waitCalendar' && ctx.message && ctx.message.calendar) {
     const dateObj = ctx.message.calendar;
     const dateStr = `${String(dateObj.day).padStart(2, '0')}.${String(dateObj.month).padStart(2, '0')}.${dateObj.year}`;
 
     ctx.session.answers[5] = dateStr;
     ctx.session.step++;
-
     await ctx.reply(
       `${questions[6]}\n${hints[6] || ''}`.trim(),
-      keyboards[6] || undefined
+      keyboards[6] || Markup.removeKeyboard()
     );
     ctx.session.dateStep = null;
-    return ctx.wizard.selectStep(1);
+    return ctx.wizard.next();
   }
 
+  // Ожидание диапазона дат
   if (ctx.session.dateStep === 'waitRange') {
     const text = ctx.message.text;
     const rangeRegex = /^(\d{2}\.\d{2}\.\d{4})\s*-\s*(\d{2}\.\d{2}\.\d{4})$/;
@@ -70,15 +72,15 @@ async function handleDateStep(ctx) {
 
     ctx.session.answers[5] = text;
     ctx.session.step++;
-
     await ctx.reply(
       `${questions[6]}\n${hints[6] || ''}`.trim(),
-      keyboards[6] || undefined
+      keyboards[6] || Markup.removeKeyboard()
     );
     ctx.session.dateStep = null;
-    return ctx.wizard.selectStep(1);
+    return ctx.wizard.next();
   }
 
+  // Ожидание месяца
   if (ctx.session.dateStep === 'waitMonth') {
     const month = ctx.message.text;
 
@@ -89,13 +91,12 @@ async function handleDateStep(ctx) {
 
     ctx.session.answers[5] = month;
     ctx.session.step++;
-
     await ctx.reply(
       `${questions[6]}\n${hints[6] || ''}`.trim(),
-      keyboards[6] || undefined
+      keyboards[6] || Markup.removeKeyboard()
     );
     ctx.session.dateStep = null;
-    return ctx.wizard.selectStep(1);
+    return ctx.wizard.next();
   }
 
   await ctx.reply('Пожалуйста, выберите или введите дату согласно инструкции.');
