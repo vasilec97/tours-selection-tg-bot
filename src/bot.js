@@ -9,6 +9,7 @@ bot.use(session());
 bot.use(stage.middleware());
 
 bot.start((ctx) => ctx.scene.enter('tour-wizard'));
+bot.hears('✏️ Заполнить новую заявку', (ctx) => ctx.scene.enter('tour-wizard'));
 
 bot.launch();
 
