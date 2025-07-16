@@ -8,13 +8,7 @@ async function handleDateStep(ctx) {
 
     switch (type) {
       case '📅 Указать дату':
-        await ctx.reply('Пожалуйста, выберите дату вылета в календаре:', {
-          reply_markup: {
-            keyboard: [[{ text: 'Открыть календарь', request_calendar: { type: 'start' } }]],
-            one_time_keyboard: true,
-            resize_keyboard: true
-          }
-        });
+        await ctx.reply('Пожалуйста, введите дату вылета в формате: 20.08.2024');
         ctx.session.dateStep = 'waitCalendar';
         return; // НЕ двигаем шаг!
 
@@ -45,11 +39,14 @@ async function handleDateStep(ctx) {
   }
 
   // Ожидание выбора даты через календарь
-  if (ctx.session.dateStep === 'waitCalendar' && ctx.message && ctx.message.calendar) {
-    const dateObj = ctx.message.calendar;
-    const dateStr = `${String(dateObj.day).padStart(2, '0')}.${String(dateObj.month).padStart(2, '0')}.${dateObj.year}`;
-
-    ctx.session.answers[5] = dateStr;
+  if (ctx.session.dateStep === 'waitCalendar' && ctx.message && ctx.message.text) {
+    const text = ctx.message.text.trim();
+    const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
+    if (!dateRegex.test(text)) {
+      await ctx.reply('❗ Неверный формат. Введите дату в формате: 20.08.2024');
+      return;
+    }
+    ctx.session.answers[5] = text;
     ctx.session.step++;
     await ctx.reply(
       `${questions[6]}\n${hints[6] || ''}`.trim(),
