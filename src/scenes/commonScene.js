@@ -7,24 +7,31 @@ const skipKeyboard = Markup.keyboard([['Пропустить']]).oneTime().resiz
 
 function makeStepHandler(idx) {
   return async function(ctx) {
+    // Диагностика
+    console.log('makeStepHandler', {
+      step: ctx.session.step,
+      text: ctx.message && ctx.message.text
+    });
+
     const step = ctx.session.step || 0;
     let schema = schemas[step];
 
-    // Не обрабатываем шаг 5 (даты) — он должен быть только в handleDateStep
+    // Не обрабатываем шаг 5 (даты)
     if (step === 5) {
       return ctx.wizard.next();
     }
 
     // Для пожеланий и email разрешаем "Пропустить" и пустой ввод
     if (step === 9 || step === 12) {
-      if (ctx.message.text === 'Пропустить' || ctx.message.text.trim() === '') {
+      if (!ctx.message.text || ctx.message.text.trim() === '' || ctx.message.text === 'Пропустить') {
         ctx.session.answers[step] = '';
         ctx.session.step++;
         if (ctx.session.step < questions.length) {
-          // После этих шагов сбрасываем клавиатуру
           await ctx.reply(
             `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
-            (ctx.session.step === 9 || ctx.session.step === 12) ? skipKeyboard : Markup.removeKeyboard()
+            (ctx.session.step === 9 || ctx.session.step === 12)
+              ? skipKeyboard
+              : Markup.removeKeyboard()
           );
           return;
         }
@@ -34,17 +41,25 @@ function makeStepHandler(idx) {
     }
 
     const { error, value } = schema.validate(ctx.message.text);
+
     if (error) {
-      await ctx.reply(`❗ ${error.message}\n${hints[step] || ''}`.trim(), (step === 9 || step === 12) ? skipKeyboard : keyboards[step] || Markup.removeKeyboard());
+      await ctx.reply(
+        `❗ ${error.message}\n${hints[step] || ''}`.trim(),
+        (step === 9 || step === 12)
+          ? skipKeyboard
+          : keyboards[step] || Markup.removeKeyboard()
+      );
       return;
     }
+
     ctx.session.answers[step] = value;
     ctx.session.step++;
     if (ctx.session.step < questions.length) {
-      // После этих шагов сбрасываем клавиатуру
       await ctx.reply(
         `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
-        (ctx.session.step === 9 || ctx.session.step === 12) ? skipKeyboard : keyboards[ctx.session.step] || Markup.removeKeyboard()
+        (ctx.session.step === 9 || ctx.session.step === 12)
+          ? skipKeyboard
+          : keyboards[ctx.session.step] || Markup.removeKeyboard()
       );
       return;
     }
