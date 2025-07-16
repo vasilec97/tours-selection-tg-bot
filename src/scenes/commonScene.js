@@ -26,6 +26,9 @@ function makeStepHandler(idx) {
         if (ctx.session.step < questions.length) {
           // После этих шагов сбрасываем клавиатуру
           await ctx.reply(
+            `DEBUG: skip step=${step}, next step=${ctx.session.step}`
+          );
+          await ctx.reply(
             `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
             (ctx.session.step === 9 || ctx.session.step === 12)
               ? skipKeyboard
@@ -54,6 +57,9 @@ function makeStepHandler(idx) {
     ctx.session.step++;
     if (ctx.session.step < questions.length) {
       // После этих шагов сбрасываем клавиатуру
+      await ctx.reply(
+        `DEBUG: step=${step}, next step=${ctx.session.step}`
+      );
       await ctx.reply(
         `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
         (ctx.session.step === 9 || ctx.session.step === 12)

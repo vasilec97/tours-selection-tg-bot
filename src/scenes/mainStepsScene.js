@@ -19,6 +19,12 @@ async function handleMainSteps(ctx) {
     if (parseInt(value, 10) === 0) {
       ctx.session.answers[3] = '';
       ctx.session.step++;
+      // Сразу задаём следующий вопрос (страна)
+      await ctx.reply(
+        `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
+        keyboards[ctx.session.step] || undefined
+      );
+      return;
     }
     await ctx.reply(
       `${questions[ctx.session.step]}\n${hints[ctx.session.step] || ''}`.trim(),
@@ -65,7 +71,7 @@ async function handleMainSteps(ctx) {
       dateTypeKeyboard
     );
     ctx.session.dateStep = 'chooseType';
-    return;
+    return ctx.wizard.next(); // <--- Важно! Переход к сцене дат
   }
   if (ctx.session.step < questions.length) {
     await ctx.reply(
