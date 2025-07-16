@@ -1,6 +1,6 @@
 const { schemas } = require('../utils/validation');
 const { hints, keyboards, questions } = require('../const');
-const { sendToBitrixAndFinish } = require('../bitrix');
+const { sendToBitrixAndFinish: sendToBitrix } = require('../bitrix');
 const { Markup } = require('telegraf');
 
 const skipKeyboard = Markup.keyboard([['Пропустить']]).oneTime().resize();
@@ -22,7 +22,7 @@ function makeStepHandler(idx) {
           );
           return;
         }
-        await sendToBitrixAndFinish(ctx, ctx);
+        await sendToBitrixAndFinish(ctx);
         return;
       }
     }
@@ -45,11 +45,10 @@ function makeStepHandler(idx) {
   };
 }
 
-// Переопределяем sendToBitrixAndFinish для показа кнопки новой заявки
 async function sendToBitrixAndFinish(ctx) {
   await ctx.reply('⏳ Отправляю ваши данные...');
   try {
-    await require('../bitrix').sendToBitrixAndFinish(ctx);
+    await sendToBitrix(ctx);
     await ctx.reply('✅ Спасибо! Ваша заявка отправлена!\n\nХотите заполнить новую заявку?\n\nНажмите кнопку ниже или отправьте /start',
       Markup.keyboard([['✏️ Заполнить новую заявку']]).resize()
     );
@@ -60,5 +59,6 @@ async function sendToBitrixAndFinish(ctx) {
 }
 
 module.exports = {
-  makeStepHandler
+  makeStepHandler,
+  sendToBitrixAndFinish
 }
