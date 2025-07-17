@@ -18,7 +18,7 @@ async function handleDateStep(ctx) {
         return;
 
       case '🗓️ Указать месяц':
-        await ctx.reply('Выберите месяц вылета:', Markup.keyboard([monthList]).oneTime().resize());
+        await ctx.reply('Выберите месяц вылета:', Markup.keyboard(monthList).oneTime().resize());
         ctx.session.dateStep = 'waitMonth';
         return;
 
