@@ -1,6 +1,6 @@
 const { schemas } = require('../utils/validation');
 const { hints, keyboards, questions } = require('../const');
-const { sendToBitrixAndFinish: sendToBitrix } = require('../bitrix');
+const { sendToBitrix } = require('../bitrix');
 const { Markup } = require('telegraf');
 
 const skipKeyboard = Markup.keyboard([['Пропустить']]).oneTime().resize();

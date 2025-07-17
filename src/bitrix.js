@@ -7,32 +7,29 @@ require('dotenv').config();
  * @returns {Promise<object>} - результат запроса к Bitrix24
  */
 async function createLeadInBitrix(answers) {
+  // Удаляем эмодзи из страны/региона для чистого текста
+  const countryRaw = answers[4] || '';
+  const country = countryRaw.replace(/[^\p{L}\p{N}\s,.-]/gu, '').trim();
+
   // Формируем данные для Bitrix24
   const fields = {
-    TITLE: `Заявка на подбор тура от ${answers[10] || 'Неизвестно'}`,
+    TITLE: `${answers[10] || 'Неизвестно'}`,
     NAME: answers[10] || '',
     PHONE: [{ VALUE: answers[11] || '', VALUE_TYPE: 'WORK' }],
     EMAIL: answers[12] ? [{ VALUE: answers[12], VALUE_TYPE: 'WORK' }] : [],
     COMMENTS:
-      `Бюджет на человека: ${answers[0]}
-` +
-      `Взрослых: ${answers[1]}
-` +
-      `Детей: ${answers[2]}
-` +
-      `Возраст детей: ${answers[3]}
-` +
-      `Страна/регион: ${answers[4]}
-` +
-      `Даты вылета: ${answers[5]}
-` +
-      `Длительность: ${answers[6]}
-` +
-      `Категория отеля: ${answers[7]}
-` +
-      `Питание: ${answers[8]}
-` +
-      `Пожелания: ${answers[9]}`
+      `Источник: Telegram\n` +
+      `Бюджет на человека: ${answers[0]}\n` +
+      `Взрослых: ${answers[1]}\n` +
+      `Детей: ${answers[2]}\n` +
+      `Возраст детей: ${answers[3]}\n` +
+      `Страна/регион: ${country}\n` +
+      `Даты вылета: ${answers[5]}\n` +
+      `Длительность: ${answers[6]}\n` +
+      `Категория отеля: ${answers[7]}\n` +
+      `Питание: ${answers[8]}\n` +
+      `Пожелания: ${answers[9]}`,
+    SOURCE_ID: 'ADVERTISING', 
   };
 
   const url = `${process.env.BITRIX_WEBHOOK}/crm.lead.add.json`;
@@ -48,9 +45,7 @@ async function createLeadInBitrix(answers) {
   }
 }
 
-async function sendToBitrixAndFinish(ctx) {
-	await ctx.reply('⏳ Отправляю ваши данные...');
-
+async function sendToBitrix(ctx) {
 	try {
 		await createLeadInBitrix(ctx.session.answers);
 		await ctx.reply('✅ Спасибо! Ваши данные отправлены. Наш менеджер свяжется с вами в ближайшее время.');
@@ -61,4 +56,4 @@ async function sendToBitrixAndFinish(ctx) {
 	return ctx.scene.leave();
 }
 
-module.exports = { createLeadInBitrix, sendToBitrixAndFinish };
+module.exports = { createLeadInBitrix, sendToBitrix };
