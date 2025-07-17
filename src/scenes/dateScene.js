@@ -81,7 +81,7 @@ async function handleDateStep(ctx) {
   if (ctx.session.dateStep === 'waitMonth') {
     const month = ctx.message.text;
 
-    if (!monthList.includes(month)) {
+    if (!monthList.flat().includes(month)) {
       await ctx.reply('Пожалуйста, выберите месяц из списка.');
       return;
     }
