@@ -65,7 +65,7 @@ async function sendToBitrixAndFinish(ctx) {
   await ctx.reply('⏳ Отправляю ваши данные...');
   try {
     await sendToBitrix(ctx);
-    await ctx.reply('✅ Спасибо! Ваша заявка отправлена!\n\nХотите заполнить новую заявку?\n\nНажмите кнопку ниже или отправьте /start',
+    await ctx.reply('Хотите заполнить новую заявку?\n\nНажмите кнопку ниже или отправьте /start',
       Markup.keyboard([['✏️ Заполнить новую заявку']]).resize()
     );
   } catch (error) {

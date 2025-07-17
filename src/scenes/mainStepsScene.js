@@ -1,5 +1,4 @@
 const { allowedCountries, keyboards, dateTypeKeyboard, questions, hints } = require('../const');
-const { sendToBitrixAndFinish } = require('../bitrix');
 const { schemas } = require('../utils/validation');
 
 async function handleMainSteps(ctx) {
@@ -80,7 +79,6 @@ async function handleMainSteps(ctx) {
     );
     return;
   }
-  await sendToBitrixAndFinish(ctx);
 }
 
 module.exports = {
